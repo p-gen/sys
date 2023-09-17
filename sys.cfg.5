@@ -1,0 +1,202 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "SYS.CFG" 5 "2023" "" "File formats and conventions"
+.SH NAME
+sys.cfg \- the global configuration file for sys.
+.\" ###################################################################
+.\" Copyright 2022, Pierre Gentile (p.gen.progs@gmail.com)
+.\" 
+.\" This Source Code Form is subject to the terms of the Mozilla Public
+.\" License, v. 2.0. If a copy of the MPL was not distributed with this
+.\" file, You can obtain one at https://mozilla.org/MPL/2.0/.
+.\" ###################################################################
+.
+.SH DESCRIPTION
+.sp
+This file must have an \fB\&.ini\fP\-like file syntax and can contain the
+sections described below, note that their capitalization does not matter.
+.sp
+It must be located in the directory specified using the parameter
+\fB\-\-with\-cfg\fP during the build phase.
+This directory is \fB/etc\fP by default..
+.sp
+It must belong to \fBroot\fP:\fBroot\fP and have \fB0600\fP permissions.
+.SH [DIRECTORIES] SECTION
+.sp
+This  section must contain the following properties:
+.INDENT 0.0
+.IP \(bu 2
+\fIData\fP
+.sp
+must contain a list of directories in which \fBsys\fP will search
+for \fIdata\fP files.
+.sp
+Each value in this list will be examined in order and must be separated by
+a space or a comma.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Data=/opt/etc/sys /etc/sys
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP \(bu 2
+\fILogs\fP
+.sp
+must contain the directory where the log files will be put.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Logs=/var/log/sys
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP \(bu 2
+\fICache\fP
+.sp
+must contain an existing directory which will host the sys cache.
+This directory does not need to be secured because the cache will
+only be readable and writable by the root user and will be rebuilt if
+deleted or modified.
+.sp
+When not present this setting defaults to \fB/etc\fP\&.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Cache=/var/cache
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP \(bu 2
+\fIPlugins\fP
+.sp
+must contain the directory where the plugins will be looked for.
+This directory must belong to \fBroot\fP:\fBroot\fP and have a mode set to
+\fB0700\fP\&.
+It will be created if it does not already exists.
+.sp
+The default value for this setting is \fB/etc/sys_plugins\fP\&.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Plugins=/etc/sys/plugins
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH [MISCELLANEOUS] SECTION
+.sp
+In this section the following properties are understood:
+.INDENT 0.0
+.IP \(bu 2
+\fIInitial environment\fP
+.sp
+Its value (if present) must be either a file containing a list of
+environment variables definitions (one per line) or an executable
+which objective is to generate a a set of line containing environment
+variables in the form \fBvariable=content\fP\&.
+These variables will overload the existing environ variable if any.
+.sp
+The executable form of this file must be owned by root to be run.
+.sp
+These variables can be altered again by using the \fIenvironment\fP
+parameter in rules.
+.IP \(bu 2
+\fIDefault paths\fP
+.sp
+When no path are given, neither using the \fIpaths\fP parameter, nor using
+a full path in the \fIcmd\fP parameter in the rule, then a default list
+of paths is used.
+Normally this list is read using the \fB_SC_PATH\fP system configuration
+variable it it exists or defaults to \fI/bin\(ga\fP and \fI/usr/bin\(ga\fP\&.
+.sp
+This list will be completed by the space or comma\-separated path list
+specified in this parameter.
+.IP \(bu 2
+\fIMaximum external commands\fP
+.sp
+This number, which defaults to \fB8\fP, sets the maximum number of
+special rule to be attempted when the given tag in not found in the
+\fBdata\fP files.
+.sp
+It must be at least equal to 1.
+.UNINDENT
+.SH EXAMPLE
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# =============================================================
+# General syntax: keyword = list in sections delimited with [].
+#                 as in standard .ini files.
+# \- list elements can be separated by commas, spaces or tabs.
+# \- = can be preceded or followed by spaces.
+# =============================================================
+
+[Directories]
+Data    = /opt/etc/sys /etc/sys
+Logs    = /var/log/sys
+Plugins = /etc/sys/plugins
+Cache   = /var/cache
+
+[Miscellaneous]
+Initial environment =
+Default paths = /usr/local/bin /opt/bin
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+p.gen.progs@gmail.com
+.SH COPYRIGHT
+MPL-2.0
+.\" Generated by docutils manpage writer.
+.
