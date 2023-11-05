@@ -56,7 +56,7 @@ Each **rule** may contain:
 
 - a *tag* (**mandatory**) starting at the first column,
 - various parameters using the syntax: ``parameter1:[value1[,[value2],...]``
-  preceeded by at least one space or tabulation mark.
+  preceded by at least one space or tabulation mark.
   A '``;``' can also be used to delimit the values instead of the '``,``':
 
   - a *cmd* parameter (**mandatory**) to give the name of the *executable*
@@ -432,7 +432,7 @@ Parameters related to restrictions.
       matched by this parameter.
 
       if the parameter is *users*, the rule will continue to be analyzed
-      as the users may belong to one of the group ot netgroup matched
+      as the users may belong to one of the group or netgroup matched
       by the constrained regular expression placed after the parameters
       *groups* or *netgroups* of the rule, see below.
 

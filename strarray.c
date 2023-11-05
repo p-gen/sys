@@ -23,7 +23,7 @@
 /* the splitting process obey the following rules:                           */
 /* if MERGESAMESEPS is set in options, a sequence of the same separator is   */
 /* considered as just one instance of this separator.                        */
-/* if NOOCTAL is set in options, Numbres with a leading 0 will not be        */
+/* if NOOCTAL is set in options, Numbers with a leading 0 will not be        */
 /* considered as octel.                                                      */
 /* if MERGESEPS is set in options, a sequence of separators as defined       */
 /* in 'seps' is considered as just one instance of this separator.           */
@@ -101,7 +101,7 @@ strarray(char *in, char ***out, int *count, char *seps, int options)
   if (buf == NULL)
     return -1;
 
-  /* manage the case of an empty imput */
+  /* manage the case of an empty input */
   /* """"""""""""""""""""""""""""""""" */
   if (len == 0)
   {

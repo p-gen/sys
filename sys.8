@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "SYS" 8 "2022" "" "Utilities"
+.TH "SYS" 8 "2023" "" "Utilities"
 .SH NAME
 sys \- a rule-based command-line tool for executing a command as another user
 .\" ###################################################################
@@ -81,7 +81,7 @@ Each \fBrule\fP may contain:
 a \fItag\fP (\fBmandatory\fP) starting at the first column,
 .IP \(bu 2
 various parameters using the syntax: \fBparameter1:[value1[,[value2],...]\fP
-preceeded by at least one space or tabulation mark.
+preceded by at least one space or tabulation mark.
 A \(aq\fB;\fP\(aq can also be used to delimit the values instead of the \(aq\fB,\fP\(aq:
 .INDENT 2.0
 .IP \(bu 2
@@ -562,7 +562,7 @@ then the whole rule be immediately denied as all users will be
 matched by this parameter.
 .sp
 if the parameter is \fIusers\fP, the rule will continue to be analyzed
-as the users may belong to one of the group ot netgroup matched
+as the users may belong to one of the group or netgroup matched
 by the constrained regular expression placed after the parameters
 \fIgroups\fP or \fInetgroups\fP of the rule, see below.
 .UNINDENT

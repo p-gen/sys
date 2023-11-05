@@ -1581,7 +1581,7 @@ check_rule_options(rule_t *rule, int *argc, char ***argv, char **err)
               aind++;           /* Next argument. */
               same_pattern = 1; /* As it is the last multiple pattern, we nee *
                                 | to make sure it can potentially match other *
-                                | arguments, so do not increment the patten   *
+                                | arguments, so do not increment the pattern  *
                                 | index.                                      */
             }
             else /* There is is at least one more pattern to examine. */
@@ -2024,7 +2024,7 @@ check_owners(rule_t *rule, char *param_name, char *path)
     }
 
     trace(LOG_DATA,
-          "[%s] unable to get owner's informations for \"%s\".",
+          "[%s] unable to get owner's information for \"%s\".",
           rule->tag,
           path);
 

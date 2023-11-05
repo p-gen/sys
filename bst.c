@@ -19,7 +19,7 @@ bst_action(void *a, void *arg);
 /* Insert or change an item in the tree.                    */
 /* If tree is NULL, create a new item.                      */
 /* if tree != NULL, walk the tree and if the item is found, */
-/*                  replace it end if not insert it.        */
+/*                  replace it, if not insert it.           */
 /* if updated != NULL set the pointed value to 1 in case of */
 /*                    update and 0 in case of insertion.    */
 /* ======================================================== */

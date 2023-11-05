@@ -102,7 +102,7 @@ log_msg(log_priority p, char *msg, va_list args)
     (void)fprintf(stderr, "Error: ");
 
     /* Use the copy of the va_list      */
-    /* as the roiginal has been altered */
+    /* as the original has been altered */
     /* by the previous vfprintf call.   */
     /* """""""""""""""""""""""""""""""" */
     (void)vfprintf(stderr, msg, args_copy);

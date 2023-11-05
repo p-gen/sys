@@ -51,37 +51,37 @@ extern char **environ;
 
 /* External variables used by egetopt */
 /* """""""""""""""""""""""""""""""""" */
-extern int   optneed;  /* character used for mandatory arguments  */
-extern int   optmaybe; /* character used for optional arguments   */
-extern int   optchar;  /* character which begins a givenargument  */
-extern int   optbad;   /* what egetopt() returns for a bad option */
-extern int   opterrfd; /* where egetopt() error messages go       */
-extern char *optstart; /* string which contains valid option      */
-                       /* start chars                             */
-extern int   optind;   /* index of current argv[]                 */
-extern int   optopt;   /* the actual option pointed to            */
-extern int   opterr;   /* set to 0 to suppress egetopt's error    *
-                         | messages                                */
-extern char *optarg;   /* the argument of the option              */
+extern int   optneed;  /* Character used for mandatory arguments  */
+extern int   optmaybe; /* Character used for optional arguments   */
+extern int   optchar;  /* Character which begins a givenargument  */
+extern int   optbad;   /* What egetopt() returns for a bad option */
+extern int   opterrfd; /* Where egetopt() error messages go       */
+extern char *optstart; /* String which contains valid option      *
+                        | start chars                             */
+extern int   optind;   /* Index of current argv[]                 */
+extern int   optopt;   /* The actual option pointed to            */
+extern int   opterr;   /* Set to 0 to suppress egetopt's error    *
+                        | messages                                */
+extern char *optarg;   /* The argument of the option              */
 
-long path_max; /* global variable which will contail the maximal   *
+long path_max; /* Global variable which will contail the maximal   *
                 | path length. This valum will be given by sysconf *
                 | or set to an arbitrary usual value.              */
 
 FILE *log_fh = NULL;
 
-bst_node_t *rule_tree; /* A binary tree of all the successfully parsed ops */
-                       /* the tree only contains the latest seen ops       */
-bst_node_t *var_tree;  /* The same for the correctly identified variables. */
-                       /* This tree is only used when reading the .dat     */
-                       /* files to create the final version of the ops so  */
-                       /* we will be able to put then in the cache         */
+bst_node_t *rule_tree; /* A binary tree of all the successfully parsed ops *
+                        | the tree only contains the latest seen ops       */
+bst_node_t *var_tree;  /* The same for the correctly identified variables. *
+                        | This tree is only used when reading the .dat     *
+                        | files to create the final version of the ops so  *
+                        | we will be able to put then in the cache         */
 bst_node_t *env_tree;
 size_t      env_count;
 
 bst_node_t *new_var_tree;
 
-static ll_t *sys_item_list; /* item list read from the rule_tree. The list *
+static ll_t *sys_item_list; /* Item list read from the rule_tree. The list *
                                | will be used to feed the cache.            */
 
 static void
@@ -277,7 +277,7 @@ search_in_paths(rule_t *rule, char *base, char **extra_path_array)
       path = xmalloc(n);
       confstr(_CS_PATH, path, n);
 
-      /* and add is components to the list of allowed paths.        */
+      /* And add is components to the list of allowed paths.        */
       /* Also add the extra default directories from the .cfg file. */
       /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
       if (strarray(path, &path_array, &n, ":", MERGESEPS | KEEPQUOTES) == 0)
@@ -700,7 +700,7 @@ exec_command(rule_t  *rule,
       /* """""""""""""""""""""""""""""""""""""""""""""""""" */
       setgroups(0, NULL); /* clear the supplementary groups. */
 
-      /* get the main group of new_username */
+      /* Get the main group of new_username */
       /* '''''''''''''''''''''''''''''''''' */
       pwd = getpwnam(new_username);
       if (pwd == NULL)
@@ -1906,7 +1906,7 @@ process_rule(rule_t *rule,
     goto error;
   }
 
-  if (pwd_param) /* the "password" parameter is set. */
+  if (pwd_param) /* The "password" parameter is set. */
   {
     /* Always ask password if the password parameter is set and no */
     /* users/groups/netgroups parameter is present.                */
@@ -1945,7 +1945,7 @@ process_rule(rule_t *rule,
     trace(LOG_WARN, msg, rule->tag);
   }
 
-  /* build a proper environment for the command associated to the command */
+  /* Build a proper environment for the command associated to the command */
   /* according to the "environment" parameter                             */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
   *new_environ = process_env(rule, environ, new_environ);
@@ -1973,11 +1973,11 @@ error:
 }
 
 /* ============================================================== */
-/* Fill a user_t structure with the user's data                   */
+/* Fill a user_t structure with the user's data.                  */
 /*                                                                */
 /* user_data (out) The resulting users's data will be put here    */
 /*                 The memory space will be dynamically allocated */
-/*                 in this function                               */
+/*                 in this function.                              */
 /* ============================================================== */
 void
 get_user_data(user_t *user_data)
@@ -2193,7 +2193,7 @@ update_params_val_lists(rule_t *rule)
   int        val_count;
   int        i, rc;
 
-  /* for each parameter of rule */
+  /* For each parameter of rule */
   /* """"""""""""""""""""""""" */
   param_node = rule->param_list->head;
   while (param_node)
@@ -2203,7 +2203,7 @@ update_params_val_lists(rule_t *rule)
     param        = (param_t *)param_node->data;
     new_val_list = ll_new();
 
-    /* for each of its values */
+    /* For each of its values */
     /* """""""""""""""""""""" */
     val_node = param->val_list->head;
     while (val_node)
@@ -2225,14 +2225,14 @@ update_params_val_lists(rule_t *rule)
           ll_append(new_val_list, xstrdup(val_array[i]));
       }
 
-      /* remove the old value from the old list */
+      /* Remove the old value from the old list */
       /* """""""""""""""""""""""""""""""""""""" */
       free(val);
       ll_delete(param->val_list, val_node);
 
       val_node = param->val_list->head;
     }
-    /* free the old list and plug the new list. */
+    /* Free the old list and plug the new list. */
     /* """""""""""""""""""""""""""""""""""""""" */
     free(param->val_list);
     param->val_list = new_val_list;
@@ -2335,12 +2335,12 @@ main(int argc, char **argv)
 
   char *error_msg = NULL;
 
-  opterrfd = fileno(stdout); /* errors to stdout */
-  opterr   = 0;              /* set this to 1 to get egetopt's error msgs */
-  optbad   = '?';            /* return '?' on error */
-  optneed  = ':';            /* mandatory arg identifier (in OPT_STRING) */
-  optmaybe = '%';            /* optional arg identifier (in OPT_STRING) */
-  optstart = "-";            /* characters that can start options */
+  opterrfd = fileno(stdout); /* Errors to stdout.                          */
+  opterr   = 0;              /* Set this to 1 to get egetopt's error msgs. */
+  optbad   = '?';            /* Return '?' on error.                       */
+  optneed  = ':';            /* Mandatory arg identifier (in OPT_STRING).  */
+  optmaybe = '%';            /* Optional arg identifier (in OPT_STRING).   */
+  optstart = "-";            /* Characters that can start options.         */
 
   path_max = pathconf(".", _PC_PATH_MAX);
   if (path_max == -1)
@@ -2442,9 +2442,9 @@ main(int argc, char **argv)
     }
   }
 
-  /* Look if we wan get some information from the loging directory and */
-  /* if it has proper permissions.                                     */
-  /* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
+  /* Look if we wan get some information from the logging directory and */
+  /* if it has proper permissions.                                      */
+  /* '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
   if (stat(log_dir, &st) == 0)
   {
     if (S_ISREG(st.st_mode))
@@ -2546,12 +2546,12 @@ main(int argc, char **argv)
   data_dirnames_list = ll_new();
 
   /* Process each directories in data_dirnames. */
-  /* and put teh in a linked list.              */
+  /* and put the in a linked list.              */
   /* '''''''''''''''''''''''''''''''''''''''''' */
   i = 0;
   while (data_dirnames[i] != NULL)
   {
-    /* validate the directory. */
+    /* Validate the directory. */
     /* ''''''''''''''''''''''' */
     if (stat(data_dirnames[i], &st) == 0)
     {
@@ -2617,7 +2617,7 @@ main(int argc, char **argv)
   }
 #endif
 
-  /* determine the maximum number of external commands allowed. */
+  /* Determine the maximum number of external commands allowed. */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
   max_ext_commands_str = ini_get(ini, "Miscellaneous", "Max External Commands");
   if (max_ext_commands_str != NULL)
@@ -2900,7 +2900,7 @@ main(int argc, char **argv)
         {
           int ok = 0;
 
-          /* the seed must take 32 bits because of the hash function used */
+          /* The seed must take 32 bits because of the hash function used */
           /* but 256 possible values is enough for our use.               */
           /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
           for (int32_t seed = 0; seed < 255; seed++)
@@ -2917,7 +2917,7 @@ main(int argc, char **argv)
             break;
           }
 
-          /* remove the invalid cache. */
+          /* Remove the invalid cache. */
           /* """"""""""""""""""""""""" */
           if (!ok)
             unlink(cache_filename); /* No verification of the return code. */
