@@ -97,10 +97,18 @@ In addition to these \fBrules\fP, data files may also contain \fBvariables\fP
 whose purpose is to facilitate the writing of the \fBrule\fP definitions
 and make them easier to read and maintain.
 .sp
-\fBsys\fP uses \fItags\fP to locate the \fBrule\fP in the data files.
-If it cannot find a \fBrule\fP through its \fItag\fP, it will try to use
-special generic \fBrules\fP identified with \fItags\fP named as \fB@\fP\fIn\fP
-where \fIn\fP is a number greater than or equal to 1.
+The \fItag\fP is used by \fBsys\fP to locate the correct \fBrule\fP in the
+data files.
+.sp
+If the \fItag\fP looks like a command with a path (contains a set of strings
+delimited by the \fB/\fP character) then only the part after thge last
+\fB/\fP will be looked for in \fBrules\fP for a match, refer to the \fIpaths\fP
+parameter definition in the section named \(dqParameters related to the
+execution context.\(dq below.
+.sp
+If \fBsys\fP cannot find a matching \fBrule\fP through its \fItag\fP, it will
+try to use special generic \fBrules\fP identified with \fItags\fP named as
+\fB@\fP\fIn\fP where \fIn\fP is a number greater than or equal to 1.
 .sp
 Note that he existence of these special rules is not mandatory.
 .sp
@@ -613,13 +621,16 @@ This parameter, which can be negated with \(aq\fB!\fP\(aq list the allowed
 .sp
 The path must be absolute (begin with a \(aq\fB/\fP\(aq).
 .sp
-If the \fItag\fP given in the command line or the \fIexecutable\fP defined by the \fIcmd\fP parameter has
-a path then this path will be checked to belong to one of
-the paths given (if any).
-If found then the \fIexecutable\fP is allowed to run.
+If the \fItag\fP given in the command line has a path (contains a \(aq/\(aq)
+then a rule for the last part of it (the basename) will be looked for.
+If such a rule is found then the path in its command part (if any)
+must match the \fItag\fP path and the \fItag\fP\(aqs path must also be present
+in the \(dqpaths\(dq parameter\(aqs list and not denied in the \(dq!paths\(dq
+parameter list also (if any).
 .sp
-If the \fIexecutable\fP does not contain a \(aq\fB/\fP\(aq, then it must
-belong to one of path paths given after this parameter.
+if the \fItag\fP given in the command line does not have a path then only
+the \(dqpaths\(dq and \(dq!paths\(dq parameters (if present)  are considered to
+enable the \fIexecutable\fP to be  run.
 .sp
 If no path list is given and this parameter is negated with \(aq\fB!\fP\(aq
 then the \fIexecutable\fP will \fBnot\fP be ran, otherwise an empty list

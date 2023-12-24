@@ -260,8 +260,9 @@ bst_rebalance(bst_t bst, int *h)
 {
   int n, t, l, lc;
 
-  /* n is the number of nodes in the original tree */
-  n  = bst_height(bst);
+  /* n is the height of the original tree */
+  n = bst_height(bst);
+
   *h = n;
 
   /* Compute l = log2(n+1) */
@@ -272,6 +273,8 @@ bst_rebalance(bst_t bst, int *h)
     ++l;
     t /= 2;
   }
+
+  /* Note: l >= 1 as n >= 1. */
 
   /* Create the deepest leaves */
   lc = n + 1 - (1 << l);

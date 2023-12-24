@@ -68,10 +68,18 @@ In addition to these **rules**, data files may also contain **variables**
 whose purpose is to facilitate the writing of the **rule** definitions
 and make them easier to read and maintain.
 
-**sys** uses *tags* to locate the **rule** in the data files.
-If it cannot find a **rule** through its *tag*, it will try to use
-special generic **rules** identified with *tags* named as ``@``\ *n*
-where *n* is a number greater than or equal to 1.
+The *tag* is used by **sys** to locate the correct **rule** in the
+data files.
+
+If the *tag* looks like a command with a path (contains a set of strings
+delimited by the ``/`` character) then only the part after thge last
+``/`` will be looked for in **rules** for a match, refer to the *paths*
+parameter definition in the section named "Parameters related to the
+execution context." below.
+
+If **sys** cannot find a matching **rule** through its *tag*, it will
+try to use special generic **rules** identified with *tags* named as
+``@``\ *n* where *n* is a number greater than or equal to 1.
 
 Note that he existence of these special rules is not mandatory.
 
@@ -476,13 +484,16 @@ prefixed *users*, *groups* end *netgroups* parameter to be rejected.
 
     The path must be absolute (begin with a '``/``').
 
-    If the *tag* given in the command line or the *executable* defined by the *cmd* parameter has
-    a path then this path will be checked to belong to one of
-    the paths given (if any).
-    If found then the *executable* is allowed to run.
+    If the *tag* given in the command line has a path (contains a '/')
+    then a rule for the last part of it (the basename) will be looked for.
+    If such a rule is found then the path in its command part (if any)
+    must match the *tag* path and the *tag*'s path must also be present
+    in the "paths" parameter's list and not denied in the "!paths"
+    parameter list also (if any).
 
-    If the *executable* does not contain a '**/**', then it must
-    belong to one of path paths given after this parameter.
+    if the *tag* given in the command line does not have a path then only
+    the "paths" and "!paths" parameters (if present)  are considered to
+    enable the *executable* to be  run.
 
     If no path list is given and this parameter is negated with '``!``'
     then the *executable* will **not** be ran, otherwise an empty list

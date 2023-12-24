@@ -510,7 +510,10 @@ ask_password(rule_t  *rule,
   {
     if (str_to_user((char *)(param_list_node->data), &uid, &name) == -1)
     {
-      trace(LOG_WARN, "[%s] uid: unknown user \"%s\".", rule->tag, name);
+      trace(LOG_WARN,
+            "[%s] uid: unknown user \"%s\".",
+            rule->tag,
+            (char *)(param_list_node->data));
       goto next;
     }
 
@@ -520,6 +523,7 @@ ask_password(rule_t  *rule,
     if (ht_search(user_pw_ok_ht, name) != NULL)
     {
       rc = 1;
+      free(name);
       break;
     }
 
@@ -528,11 +532,13 @@ ask_password(rule_t  *rule,
     if (check_password(name))
     {
       rc = 1;
+      ht_insert(user_pw_ok_ht, name, "ok"); /* Here "ok" is a dummy value. */
       break;
     }
 
-  next:
     free(name);
+
+  next:
     param_list_node = param_list_node->next;
   }
 
@@ -542,7 +548,6 @@ ask_password(rule_t  *rule,
       trace(LOG_INFO, "[%s] access granted.", rule->tag + 1);
     else
       trace(LOG_INFO, "[%s] access granted.", rule->tag);
-    ht_insert(user_pw_ok_ht, name, "ok"); /* Here "ok" is a dummy value. */
   }
   else
   {
@@ -1509,7 +1514,7 @@ process_rule(rule_t *rule,
              char  **new_username,
              char  **new_groupname,
              int     daemon_flag,
-             char  **real_pathname,
+             char   *rule_tag,
              char   *req_user,
              char   *req_group,
              user_t *user_data,
@@ -1585,7 +1590,7 @@ process_rule(rule_t *rule,
   {
     /* Check if the executable is not present in a denied path. */
     /* '''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
-    if (check_paths(rule, rule->executable, "!paths", real_pathname))
+    if (check_paths(rule, rule->executable, "!paths", rule_tag))
     {
       char *msg = "[%s] path constraints not respected for \"%s\".";
 
@@ -1597,7 +1602,7 @@ process_rule(rule_t *rule,
 
     /* Check if the executable is present in a mandatory path. */
     /* """"""""""""""""""""""""""""""""""""""""""""""""""""""" */
-    if (!check_paths(rule, rule->executable, "paths", real_pathname))
+    if (!check_paths(rule, rule->executable, "paths", rule_tag))
     {
       char *msg = "[%s] path constraints not respected for \"%s\".";
 
@@ -2301,7 +2306,8 @@ main(int argc, char **argv)
   ll_t *data_filenames_list;
   ll_t *misc_filenames_list;
 
-  char *rule_tag;
+  char *rule_tag          = NULL;
+  char *rule_tag_basename = NULL;
 
   rule_t *rule;
 
@@ -2719,6 +2725,16 @@ main(int argc, char **argv)
   /*   Update the cache with these data in the background.     */
   /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""" */
 
+  /* get the basename of the tag if it exists to first try using a     */
+  /* potentially existing rule instead of using a potentially generic. */
+  /* one directly.                                                     */
+  /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+  rule_tag_basename = strrchr(rule_tag, '/');
+  if (rule_tag_basename != NULL && *(rule_tag_basename + 1) == '\0')
+    rule_tag_basename = NULL;
+  else if (rule_tag_basename != NULL)
+    rule_tag_basename++;
+
   /* Check if we can use the cache or if we must rebuild it. */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""""" */
   cache_status = cache_get_status(cache_filename);
@@ -2737,7 +2753,12 @@ main(int argc, char **argv)
     char *new_username;
     char *new_groupname;
 
-    if (cache_search(cache_filename, rule_tag, (void **)&data, &data_len))
+    if (cache_search(cache_filename, rule_tag, (void **)&data, &data_len)
+        || (rule_tag_basename != NULL
+            && cache_search(cache_filename,
+                            rule_tag_basename,
+                            (void **)&data,
+                            &data_len)))
     {
       rule = build_rule_from_cache(rule_tag, rule_tag, data, data_len);
       process_rule(rule,
@@ -2749,7 +2770,7 @@ main(int argc, char **argv)
                    &new_username,
                    &new_groupname,
                    daemon_flag,
-                   &real_pathname,
+                   rule_tag,
                    req_user,
                    req_groups,
                    &user_data,
@@ -2788,7 +2809,7 @@ main(int argc, char **argv)
                        &new_username,
                        &new_groupname,
                        daemon_flag,
-                       &real_pathname,
+                       rule_tag,
                        req_user,
                        req_groups,
                        &user_data,
@@ -2933,7 +2954,14 @@ main(int argc, char **argv)
       {
         if (!list_flag)
         {
-          dummy_rule.tag = rule_tag;
+          /* If the tag has a path, then use the basename of this tag instead */
+          /* of the tag itself in order to sear for a matching rule.          */
+          /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+          if (rule_tag_basename)
+            dummy_rule.tag = rule_tag_basename;
+          else
+            dummy_rule.tag = rule_tag;
+
           if ((rule = bst_search(rule_tree, &dummy_rule, rule_entry_comp))
               != NULL)
           {
@@ -2953,7 +2981,7 @@ main(int argc, char **argv)
                          &new_username,
                          &new_groupname,
                          daemon_flag,
-                         &real_pathname,
+                         rule_tag,
                          req_user,
                          req_groups,
                          &user_data,
@@ -3030,7 +3058,7 @@ main(int argc, char **argv)
                              &new_username,
                              &new_groupname,
                              daemon_flag,
-                             &real_pathname,
+                             rule_tag,
                              req_user,
                              req_groups,
                              &user_data,

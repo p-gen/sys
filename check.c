@@ -776,10 +776,7 @@ check_groups(rule_t *rule, user_t *ud, char *date, char *param_name)
 /* The possible path in the executable if taken into account.          */
 /* =================================================================== */
 int
-check_paths(rule_t *rule,
-            char   *user_command,
-            char   *param_name,
-            char  **real_pathname)
+check_paths(rule_t *rule, char *user_command, char *param_name, char *rule_tag)
 
 {
   ll_t      *val_list;
@@ -790,6 +787,9 @@ check_paths(rule_t *rule,
   char *command_base; /* the base part (after the last / if any).          */
   char *slash;        /* The address of the last / if any in user_command. */
   char *command;      /* A work copy of user_command.                      */
+  char *tmp_rule_tag = NULL; /* temp variable used if we must override     *
+                              | the executable path when rule_tag has a    *
+                              | path.                                      */
 
   enum
   {
@@ -806,8 +806,6 @@ check_paths(rule_t *rule,
   /* 4 command hasn't path + param not present   -> same as 3.              */
   /* 5 param present       + no paths given      -> same as 3.              */
   /* ---------------------------------------------------------------------- */
-
-  *real_pathname = NULL;
 
   path_max = pathconf("/", _PC_PATH_MAX);
   if (path_max == -1)
@@ -838,6 +836,41 @@ check_paths(rule_t *rule,
     command_base = command;
   }
 
+  /* Special processing if the CLI tag parameter have a path:             */
+  /* This path must match the command path is any and if so this path     */
+  /* will be compared with the paths in the "paths" parameter if present. */
+  /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+  tmp_rule_tag = strdup(rule_tag);
+  slash        = strrchr(tmp_rule_tag, '/');
+  if (slash != NULL)
+  {
+    char *tmp_rule_tag_path;
+
+    *slash            = '\0';
+    tmp_rule_tag_path = realpath(tmp_rule_tag, NULL);
+
+    /* Fails if the real path is not valid without exiting the program */
+    /* as this case will be checked later.                             */
+    /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+    if (tmp_rule_tag_path == NULL)
+    {
+      free(command);
+      free(tmp_rule_tag);
+
+      if (*param_name == '!') /* !paths: */
+        return FOUND;
+      else /* paths: */
+        return NOT_FOUND;
+    }
+
+    if (command_path != NULL && strcmp(command_path, tmp_rule_tag_path) != 0)
+      error("%s must be the same as the command path (%s).",
+            tmp_rule_tag_path,
+            command_path);
+    else
+      command_path = tmp_rule_tag_path;
+  }
+
   /* Extract the list of the values of param_name. */
   /* """"""""""""""""""""""""""""""""""""""""""""" */
   val_list = get_param_val_list(rule, param_name);
@@ -845,6 +878,7 @@ check_paths(rule_t *rule,
   if (val_list && val_list->len == 0)
   {
     free(command); /* 5 */
+    free(tmp_rule_tag);
 
     return FOUND;
   }
@@ -886,6 +920,7 @@ check_paths(rule_t *rule,
       /* When all paths have been checked... */
       /* """"""""""""""""""""""""""""""""""" */
       free(command);
+      free(tmp_rule_tag);
 
       if (node == NULL)
         return NOT_FOUND;
@@ -935,6 +970,7 @@ check_paths(rule_t *rule,
       /* """"""""""""""""""""""""""""""""""""""" */
       free(curr_path);
       free(command);
+      free(tmp_rule_tag);
 
       if (node == NULL)
         return NOT_FOUND;
@@ -945,10 +981,11 @@ check_paths(rule_t *rule,
   else /* 3 or 4 */
   {
     free(command);
+    free(tmp_rule_tag);
 
-    if (*param_name == '!')
+    if (*param_name == '!') /* !paths: */
       return NOT_FOUND;
-    else /* !paths */
+    else /* paths: */
       return FOUND;
   }
 }
@@ -1384,7 +1421,7 @@ check_rule_options(rule_t *rule, int *argc, char ***argv, char **err)
   int i;          /* Generic integer index. */
   int aind, pind; /* Command line word index and pattern index. */
 
-  unsigned accept;         /* 1: the checking can continue.           */
+  unsigned accept = 0;     /* 1: the checking can continue.           */
   unsigned matched = 0;    /* # of matches for a current pattern.     */
   ht_t     re_patterns_ht; /* mapping pattern string -> RE list.      */
 

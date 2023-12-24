@@ -380,7 +380,6 @@ process_old_var(void)
       var->value[l - 1] = '\0';
 
     expand_var_ref(&var->value);
-    hexdump(var->value , stderr, "", strlen(var->value));
     var_tree = bst_insert(var_tree, var, item_comp, NULL);
 
     var = NULL;

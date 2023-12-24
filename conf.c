@@ -258,9 +258,6 @@ expand_var_ref(char **str)
     else
       finished = 1;
   } while (!finished);
-  //hexdump(*str , stderr, old_str, strlen(*str));
-  //free(old_str);
-  fputs("\n", stderr);
 }
 
 /* ====================================================== */

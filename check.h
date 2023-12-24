@@ -65,7 +65,7 @@ int
 check_paths(rule_t *rule,
             char   *user_command,
             char   *param_name,
-            char  **real_pathname);
+            char   *rule_tag);
 void
 decode_pattern(char *pattern, pattern_type_t *type, int *pos);
 
