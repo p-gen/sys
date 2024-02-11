@@ -1,24 +1,62 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+/* **************************** */
+/* Memory management functions. */
+/* **************************** */
 
-#include "xmalloc.h"
-
-/* *************************** */
-/* Memory allocation functions */
-/* *************************** */
-
-/* Created by Kevin Locke (from numerous canonical examples)         */
+/* ***************************************************************** */
+/* Created by Kevin Locke (from numerous canonical examples).        */
+/*                                                                   */
+/* Adapted for use by smenu.                                         */
 /*                                                                   */
 /* I hereby place this file in the public domain.  It may be freely  */
 /* reproduced, distributed, used, modified, built upon, or otherwise */
 /* employed by anyone for any purpose without restriction.           */
-/* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+/* ***************************************************************** */
 
-/* ================= */
-/* Customized malloc */
-/* ================= */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
+#include "config.h"
+#include "xmalloc.h"
+
+/* The following rpl_* function are necessary for AIX which doesn't     */
+/* provide 'GNU compatible' allocation functions.                       */
+/* Every call to malloc()/realloc() is then replaced by a call to       */
+/* rpl_malloc()/rpl_realloc() as defined in the GNU generated config.h. */
+/* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+
+#ifdef malloc
+
+#undef malloc
+extern void *malloc(size_t);
+
+void *
+rpl_malloc(size_t size)
+{
+  if (!size)
+    size++;
+  return malloc(size);
+}
+
+#undef realloc
+extern void *
+realloc(void *, size_t);
+
+void *
+rpl_realloc(void *ptr, size_t size)
+{
+  if (!size)
+    size++;
+  return (ptr ? realloc(ptr, size) : malloc(size));
+}
+
+#endif
+
+/* ================================================================== */
+/* Customized malloc.                                                 */
+/* Displays an error message and exits gracefully if an error occurs. */
+/* ================================================================== */
 void *
 xmalloc(size_t size)
 {
@@ -30,9 +68,8 @@ xmalloc(size_t size)
   if (allocated == NULL)
   {
     fprintf(stderr,
-            "Error:  Insufficient memory "
-            "(attempt to malloc %lu bytes)\n",
-            (unsigned long int)size);
+            "Error: Insufficient memory (attempt to malloc %zu bytes)\n",
+            size);
 
     exit(EXIT_FAILURE);
   }
@@ -40,9 +77,10 @@ xmalloc(size_t size)
   return allocated;
 }
 
-/* ================= */
-/* Customized calloc */
-/* ================= */
+/* ================================================================== */
+/* Customized calloc.                                                 */
+/* Displays an error message and exits gracefully if an error occurs. */
+/* ================================================================== */
 void *
 xcalloc(size_t n, size_t size)
 {
@@ -54,9 +92,8 @@ xcalloc(size_t n, size_t size)
   if (allocated == NULL)
   {
     fprintf(stderr,
-            "Error:  Insufficient memory "
-            "(attempt to calloc %lu bytes)\n",
-            (unsigned long int)size);
+            "Error: Insufficient memory (attempt to calloc %zu bytes)\n",
+            size);
 
     exit(EXIT_FAILURE);
   }
@@ -64,9 +101,10 @@ xcalloc(size_t n, size_t size)
   return allocated;
 }
 
-/* ================== */
-/* Customized realloc */
-/* ================== */
+/* ================================================================== */
+/* Customized realloc.                                                */
+/* Displays an error message and exits gracefully if an error occurs. */
+/* ================================================================== */
 void *
 xrealloc(void *p, size_t size)
 {
@@ -76,9 +114,8 @@ xrealloc(void *p, size_t size)
   if (allocated == NULL && size > 0)
   {
     fprintf(stderr,
-            "Error:  Insufficient memory "
-            "(attempt to xrealloc %lu bytes)\n",
-            (unsigned long int)size);
+            "Error: Insufficient memory (attempt to realloc %zu bytes)\n",
+            size);
 
     exit(EXIT_FAILURE);
   }
@@ -86,25 +123,53 @@ xrealloc(void *p, size_t size)
   return allocated;
 }
 
-/* ==================================== */
-/* strdup implementation ussing xmalloc */
-/* ==================================== */
+/* ================================================================== */
+/* strdup implementation using xmalloc.                               */
+/* Displays an error message and exits gracefully if an error occurs. */
+/* ================================================================== */
 char *
 xstrdup(const char *str)
 {
-  char *p = xmalloc(strlen(str) + 1);
+  char *p;
+
+  p = malloc(strlen(str) + 1);
+
+  if (p == NULL)
+  {
+    fprintf(stderr, "Error: Insufficient memory for xstrdup.\n");
+    exit(EXIT_FAILURE);
+  }
+
   strcpy(p, str);
+
   return p;
 }
 
-/* ===================================== */
-/* strndup implementation ussing xmalloc */
-/* ===================================== */
+/* ================================================================== */
+/* strndup implementation using xmalloc.                              */
+/* This version guarantees that there is a final '\0'.                */
+/* Displays an error message and exits gracefully if an error occurs. */
+/* ================================================================== */
 char *
-xstrndup(const char *str, unsigned len)
+xstrndup(const char *str, size_t len)
 {
-  char *p = xmalloc(len + 1);
-  strncpy(p, str, len);
+  char *p;
+
+  p = memchr(str, '\0', len);
+
+  if (p != NULL)
+    len = p - str;
+
+  p = malloc(len + 1);
+
+  if (p == NULL)
+  {
+    fprintf(stderr, "Error: Insufficient memory for xstrndup.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  memcpy(p, str, len);
   p[len] = '\0';
+
   return p;
 }
