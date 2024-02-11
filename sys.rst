@@ -24,7 +24,7 @@ a rule-based command-line tool for executing a command as another user
 SYNOPSIS
 ========
 
-**sys** [*options*...] *tag* [*arguments*...]
+**sys** [*options*...] [path]*tag* [*arguments*...]
 
 *options* can be one of:
 
@@ -71,17 +71,18 @@ and make them easier to read and maintain.
 The *tag* is used by **sys** to locate the correct **rule** in the
 data files.
 
-If the *tag* looks like a command with a path (contains a set of strings
+If the *tag* is prefixed with a path (starts with a set of strings
 delimited by the ``/`` character) then only the part after thge last
 ``/`` will be looked for in **rules** for a match, refer to the *paths*
 parameter definition in the section named "Parameters related to the
 execution context." below.
 
-If **sys** cannot find a matching **rule** through its *tag*, it will
+If **sys** cannot find a matching **rule** for this *tag*, it will
 try to use special generic **rules** identified with *tags* named as
 ``@``\ *n* where *n* is a number greater than or equal to 1.
 
-Note that he existence of these special rules is not mandatory.
+Note that he existence of these special rules is not mandatory. but in
+this case a rule for this *tag* must exist.
 
 These special **rules** will be considered in order until one of them
 succeeds or the maximum number of attempts is exceeded.

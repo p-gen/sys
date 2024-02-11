@@ -40,7 +40,7 @@ sys \- a rule-based command-line tool for executing a command as another user
 .
 .SH SYNOPSIS
 .sp
-\fBsys\fP [\fIoptions\fP\&...] \fItag\fP [\fIarguments\fP\&...]
+\fBsys\fP [\fIoptions\fP\&...] [path]*tag* [\fIarguments\fP\&...]
 .sp
 \fIoptions\fP can be one of:
 .INDENT 0.0
@@ -100,17 +100,18 @@ and make them easier to read and maintain.
 The \fItag\fP is used by \fBsys\fP to locate the correct \fBrule\fP in the
 data files.
 .sp
-If the \fItag\fP looks like a command with a path (contains a set of strings
+If the \fItag\fP is prefixed with a path (starts with a set of strings
 delimited by the \fB/\fP character) then only the part after thge last
 \fB/\fP will be looked for in \fBrules\fP for a match, refer to the \fIpaths\fP
 parameter definition in the section named \(dqParameters related to the
 execution context.\(dq below.
 .sp
-If \fBsys\fP cannot find a matching \fBrule\fP through its \fItag\fP, it will
+If \fBsys\fP cannot find a matching \fBrule\fP for this \fItag\fP, it will
 try to use special generic \fBrules\fP identified with \fItags\fP named as
 \fB@\fP\fIn\fP where \fIn\fP is a number greater than or equal to 1.
 .sp
-Note that he existence of these special rules is not mandatory.
+Note that he existence of these special rules is not mandatory. but in
+this case a rule for this \fItag\fP must exist.
 .sp
 These special \fBrules\fP will be considered in order until one of them
 succeeds or the maximum number of attempts is exceeded.
