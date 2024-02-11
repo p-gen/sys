@@ -97,7 +97,7 @@ ini_load(const char *filename, unsigned *error, unsigned *error_line)
 
   /* Create a new ini_info */
   ret             = xmalloc(sizeof *ret);
-  ret->filename   = strdup(filename);
+  ret->filename   = xstrdup(filename);
   ret->line       = 0;
   ret->curr_sect  = 0;
   ret->curr_param = 0;
@@ -138,7 +138,7 @@ ini_load(const char *filename, unsigned *error, unsigned *error_line)
       curr_sect       = xmalloc(sizeof *curr_sect);
       curr_sect->next = 0;
       curr_sect->head = 0;
-      curr_sect->name = strdup(s);
+      curr_sect->name = xstrdup(s);
 
       /* Append it to the end. */
       *prev_sect = curr_sect;
@@ -192,8 +192,8 @@ ini_load(const char *filename, unsigned *error, unsigned *error_line)
 
         /* Create parameter. */
         curr        = xmalloc(sizeof *curr);
-        curr->name  = strdup(s);
-        curr->value = strdup(value);
+        curr->name  = xstrdup(s);
+        curr->value = xstrdup(value);
         curr->next  = 0;
         /* Append it to the end. */
         *prev = curr;

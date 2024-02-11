@@ -815,7 +815,7 @@ check_paths(rule_t *rule, char *user_command, char *param_name, char *rule_tag)
 
   /* Get the executable name preceded or not by its path. */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""" */
-  command                          = strdup(rule->executable);
+  command                          = xstrdup(rule->executable);
   command[strcspn(command, " \t")] = '\0';
 
   /* Extract the path from executable if any. */
@@ -840,7 +840,7 @@ check_paths(rule_t *rule, char *user_command, char *param_name, char *rule_tag)
   /* This path must match the command path is any and if so this path     */
   /* will be compared with the paths in the "paths" parameter if present. */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
-  tmp_rule_tag = strdup(rule_tag);
+  tmp_rule_tag = xstrdup(rule_tag);
   slash        = strrchr(tmp_rule_tag, '/');
   if (slash != NULL)
   {
@@ -1421,7 +1421,7 @@ check_rule_options(rule_t *rule, int *argc, char ***argv, char **err)
   int i;          /* Generic integer index. */
   int aind, pind; /* Command line word index and pattern index. */
 
-  unsigned accept = 0;     /* 1: the checking can continue.           */
+  unsigned accept  = 0;    /* 1: the checking can continue.           */
   unsigned matched = 0;    /* # of matches for a current pattern.     */
   ht_t     re_patterns_ht; /* mapping pattern string -> RE list.      */
 
@@ -1467,7 +1467,7 @@ check_rule_options(rule_t *rule, int *argc, char ***argv, char **err)
       /* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
       if (inserts_list == NULL)
         inserts_list = ll_new();
-      ll_append(inserts_list, strdup(pattern_a[i + 1]));
+      ll_append(inserts_list, xstrdup(pattern_a[i + 1]));
     }
     else
     {
